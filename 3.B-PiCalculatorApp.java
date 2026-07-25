@@ -42,7 +42,7 @@ public class PiCalculator {
         System.out.println("Series used: Leibniz Series (4/1-4/3+4/5-4/7+4/9...)");
     }
 
-    // Step 4 (Algorithm): Protected method to calculate area
+    // Protected method to calculate area
     protected double calculateArea(double radius) {
         return computedPi * radius * radius;
     }
@@ -71,16 +71,6 @@ public class PiCalculator {
 
         // Calling method to show private data
         calc.displayPrivateData();
-
-        /*
-         * Step 7c: Try accessing the private variable directly.
-         * 
-         * Note: Because main() is inside the PiCalculator class, calc.terms is technically 
-         * accessible here. However, if this main() method were in a different driver class, 
-         * the following line would throw a compile-time error, confirming access control:
-         * 
-         * System.out.println(calc.terms); // ERROR: terms has private access
-         */
 
         scanner.close();
     }
