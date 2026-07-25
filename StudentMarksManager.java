@@ -1,121 +1,152 @@
-import java.io.*;
-import java.util.*;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 
-public class StudentMarksManager {
-    private static final String FILE_NAME = "students.txt";
+public class StudentRegistration extends JFrame implements ActionListener {
+    private JTextField usnField;
+    private JTextField nameField;
+    private JComboBox<String> branchBox;
+    private JRadioButton maleRadio, femaleRadio;
+    private ButtonGroup genderGroup;
+    private JCheckBox javaCheck, pythonCheck;
+    private JButton submitBtn, clearBtn;
+    private JTextArea displayArea;
+
+    public StudentRegistration() {
+        setTitle("Student Registration Form");
+        setSize(500, 600);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new BorderLayout(10, 10));
+
+        JPanel topPanel = new JPanel();
+        topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
+        
+        JLabel headerLabel = new JLabel("STUDENT REGISTRATION FORM");
+        headerLabel.setFont(new Font("Monospaced", Font.BOLD, 18));
+        headerLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        JLabel separator1 = new JLabel("---------------------------------------------------------");
+        separator1.setAlignmentX(Component.CENTER_ALIGNMENT);
+        JLabel separator2 = new JLabel("---------------------------------------------------------");
+        separator2.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        topPanel.add(separator1);
+        topPanel.add(headerLabel);
+        topPanel.add(separator2);
+        
+        add(topPanel, BorderLayout.NORTH);
+
+        JPanel formPanel = new JPanel(new GridLayout(5, 2, 10, 15));
+        formPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        formPanel.add(new JLabel("USN            :"));
+        usnField = new JTextField();
+        formPanel.add(usnField);
+
+        formPanel.add(new JLabel("Name           :"));
+        nameField = new JTextField();
+        formPanel.add(nameField);
+
+        formPanel.add(new JLabel("Branch         :"));
+        String[] branches = {"Computer Science", "Information Science", "Electronics", "Mechanical", "Civil"};
+        branchBox = new JComboBox<>(branches);
+        formPanel.add(branchBox);
+
+        formPanel.add(new JLabel("Gender         :"));
+        JPanel genderPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        maleRadio = new JRadioButton("Male   ");
+        femaleRadio = new JRadioButton("Female");
+        genderGroup = new ButtonGroup();
+        genderGroup.add(maleRadio);
+        genderGroup.add(femaleRadio);
+        genderPanel.add(maleRadio);
+        genderPanel.add(femaleRadio);
+        formPanel.add(genderPanel);
+
+        formPanel.add(new JLabel("Skills         :"));
+        JPanel skillsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        javaCheck = new JCheckBox("Java   ");
+        pythonCheck = new JCheckBox("Python");
+        skillsPanel.add(javaCheck);
+        skillsPanel.add(pythonCheck);
+        formPanel.add(skillsPanel);
+
+        JPanel centerPanel = new JPanel(new BorderLayout());
+        centerPanel.add(formPanel, BorderLayout.CENTER);
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        submitBtn = new JButton("Submit");
+        clearBtn = new JButton("Clear");
+        submitBtn.addActionListener(this);
+        clearBtn.addActionListener(this);
+        buttonPanel.add(submitBtn);
+        buttonPanel.add(clearBtn);
+        
+        centerPanel.add(buttonPanel, BorderLayout.SOUTH);
+        add(centerPanel, BorderLayout.CENTER);
+
+        JPanel bottomPanel = new JPanel(new BorderLayout(5, 5));
+        bottomPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
+        
+        JPanel detailsHeaderPanel = new JPanel();
+        detailsHeaderPanel.setLayout(new BoxLayout(detailsHeaderPanel, BoxLayout.Y_AXIS));
+        JLabel separator3 = new JLabel("---------------------------------------------------------");
+        JLabel detailsLabel = new JLabel("Student Details");
+        JLabel separator4 = new JLabel("---------------------------------------------------------");
+        detailsHeaderPanel.add(separator3);
+        detailsHeaderPanel.add(detailsLabel);
+        detailsHeaderPanel.add(separator4);
+        
+        bottomPanel.add(detailsHeaderPanel, BorderLayout.NORTH);
+
+        displayArea = new JTextArea(8, 40);
+        displayArea.setEditable(false);
+        displayArea.setFont(new Font("Monospaced", Font.PLAIN, 14));
+        bottomPanel.add(new JScrollPane(displayArea), BorderLayout.CENTER);
+
+        add(bottomPanel, BorderLayout.SOUTH);
+
+        setLocationRelativeTo(null);
+        setVisible(true);
+    }
+
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == submitBtn) {
+            String usn = usnField.getText().trim();
+            String name = nameField.getText().trim();
+            String branch = (String) branchBox.getSelectedItem();
+            
+            String gender = "";
+            if (maleRadio.isSelected()) {
+                gender = "Male";
+            } else if (femaleRadio.isSelected()) {
+                gender = "Female";
+            }
+
+            StringBuilder skills = new StringBuilder();
+            if (javaCheck.isSelected()) skills.append("Java ");
+            if (pythonCheck.isSelected()) skills.append("Python");
+
+            String result = "USN    : " + usn + "\n" +
+                            "Name   : " + name + "\n" +
+                            "Branch : " + branch + "\n" +
+                            "Gender : " + gender + "\n" +
+                            "Skills : " + skills.toString().trim();
+                            
+            displayArea.setText(result);
+            
+        } else if (e.getSource() == clearBtn) {
+            usnField.setText("");
+            nameField.setText("");
+            branchBox.setSelectedIndex(0);
+            genderGroup.clearSelection();
+            javaCheck.setSelected(false);
+            pythonCheck.setSelected(false);
+            displayArea.setText("");
+        }
+    }
 
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        while (true) {
-            System.out.println("\n--- Student Marks System ---");
-            System.out.println("1. Add Student");
-            System.out.println("2. View All Students");
-            System.out.println("3. Update Marks");
-            System.out.println("4. Exit");
-            System.out.print("Choice: ");
-            
-            int choice = scanner.nextInt();
-            scanner.nextLine();
-
-            switch (choice) {
-                case 1:
-                    addStudent(scanner);
-                    break;
-                case 2:
-                    viewStudents();
-                    break;
-                case 3:
-                    updateMarks(scanner);
-                    break;
-                case 4:
-                    System.out.println("Exiting...");
-                    System.exit(0);
-                default:
-                    System.out.println("Invalid choice.");
-            }
-        }
-    }
-
-    private static void addStudent(Scanner scanner) {
-        System.out.print("Enter Roll Number: ");
-        String roll = scanner.nextLine();
-        System.out.print("Enter Name: ");
-        String name = scanner.nextLine();
-        System.out.print("Enter Marks: ");
-        String marks = scanner.nextLine();
-
-        try (PrintWriter out = new PrintWriter(new FileWriter(FILE_NAME, true))) {
-            out.println(roll + "," + name + "," + marks);
-            System.out.println("Student added successfully.");
-        } catch (IOException e) {
-            System.out.println("Error saving data.");
-        }
-    }
-
-    private static void viewStudents() {
-        File file = new File(FILE_NAME);
-        if (!file.exists()) {
-            System.out.println("No records found.");
-            return;
-        }
-
-        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-            String line;
-            System.out.printf("%-10s %-20s %-10s%n", "Roll No", "Name", "Marks");
-            System.out.println("---------------------------------------------");
-            while ((line = br.readLine()) != null) {
-                String[] data = line.split(",");
-                if (data.length == 3) {
-                    System.out.printf("%-10s %-20s %-10s%n", data[0], data[1], data[2]);
-                }
-            }
-        } catch (IOException e) {
-            System.out.println("Error reading data.");
-        }
-    }
-
-    private static void updateMarks(Scanner scanner) {
-        System.out.print("Enter Roll Number to update: ");
-        String targetRoll = scanner.nextLine();
-        
-        File file = new File(FILE_NAME);
-        if (!file.exists()) {
-            System.out.println("No records found.");
-            return;
-        }
-
-        List<String> records = new ArrayList<>();
-        boolean found = false;
-
-        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                String[] data = line.split(",");
-                if (data.length == 3 && data[0].equals(targetRoll)) {
-                    System.out.print("Enter new marks for " + data[1] + ": ");
-                    String newMarks = scanner.nextLine();
-                    records.add(data[0] + "," + data[1] + "," + newMarks);
-                    found = true;
-                } else {
-                    records.add(line);
-                }
-            }
-        } catch (IOException e) {
-            System.out.println("Error reading data.");
-            return;
-        }
-
-        if (found) {
-            try (PrintWriter out = new PrintWriter(new FileWriter(FILE_NAME, false))) {
-                for (String record : records) {
-                    out.println(record);
-                }
-                System.out.println("Marks updated successfully.");
-            } catch (IOException e) {
-                System.out.println("Error updating data.");
-            }
-        } else {
-            System.out.println("Roll Number not found.");
-        }
+        SwingUtilities.invokeLater(() -> new StudentRegistration());
     }
 }
